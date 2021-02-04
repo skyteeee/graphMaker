@@ -25,6 +25,11 @@ body {
     background-color: greenyellow;
     padding: 10px 20px;
     cursor: pointer;
+    border-width: 0;
+}
+
+.button:focus {
+    outline: 0;
 }
 
 .button:hover {
@@ -42,6 +47,16 @@ body {
 
 .undo_button {
     background-color: #ff7f7f;
+}
+
+.clear_button {
+    background-color: #ffcb00;
+}
+
+.clear_button:hover {
+    background-color: yellow;
+    border: 1px solid #9c9c00;
+    box-shadow: 0 0 10px #ffcb00;
 }
 
 .buttons {
@@ -68,11 +83,12 @@ body {
 
 .canvas_holder {
     background-color: #ccf1ff;
-    flex-grow: 4;
+    flex-grow: 5;
 }
 
 .table_area {
-    flex-grow: 1;
+    flex-grow: 3;
+    min-height: 25%;
     overflow: auto;
     margin: 15px 0;
 }
@@ -84,4 +100,23 @@ body {
 
 .table_area .text {
     height: 20px;
+}
+
+.table ol {
+    padding: 0;
+    list-style: none;
+    counter-reset: list-counter;
+}
+
+.table li {
+    padding: 5px 5px;
+    counter-increment: list-counter;
+}
+
+.table li::before{
+    content: counter(list-counter)". ";
+}
+
+.table li:nth-child(odd) {
+    background-color: #f5f5f5;
 }
