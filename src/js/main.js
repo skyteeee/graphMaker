@@ -4,18 +4,16 @@ function ugmInit() {
     let height = canvas.offsetHeight;
     canvas.width=width;
     canvas.height=height;
-    if (!storage.getItem("GraphMaker")){
-        storage.setItem("GraphMaker", JSON.stringify([]));
-    } else {
-        ugmLoad();
-    }
+    ugmLoad();
     console.log("Loaded.")
 }
 
 function ugmLoad() {
-    data.numbers=JSON.parse(storage.getItem("GraphMaker"));
-    ugmDraw();
-    ugmUpdateList();
+    if (storage.getItem("GraphMaker2")){
+        data=JSON.parse(storage.getItem("GraphMaker2"));
+        ugmDraw();
+        ugmUpdateList();
+    }
 }
 
 function ugmAddNumber() {
@@ -27,18 +25,31 @@ function ugmAddNumber() {
 
 }
 
+function ugmDeleteSpecific(idx) {
+    data.numbers.splice(idx, 1);
+    ugmUpdateAll();
+}
+
 function ugmUpdateList() {
     let list = document.getElementById("list");
     list.innerHTML="";
-    for (let value of data.numbers){
+    for (let idx in data.numbers){
+        let value = data.numbers[idx];
         let string = document.createElement("li");
+        let image = document.createElement("img");
+        image.alt = "X";
+        image.src = "omg/cross.png";
+        image.onclick = () => {ugmDeleteSpecific(idx)};
+        let div = document.createElement("div");
         string.innerText = value;
+        string.appendChild(div);
+        div.appendChild(image);
         list.appendChild(string);
     }
 }
 
 function ugmUpdateStorage() {
-    storage.setItem("GraphMaker", JSON.stringify(data.numbers));
+    storage.setItem("GraphMaker2", JSON.stringify(data));
     console.log("Successfully updated storage.");
 }
 
