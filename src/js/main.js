@@ -9,8 +9,8 @@ function ugmInit() {
 }
 
 function ugmLoad() {
-    if (storage.getItem("GraphMaker2")){
-        data=JSON.parse(storage.getItem("GraphMaker2"));
+    if (storage.getItem("GraphMaker3")){
+        data=JSON.parse(storage.getItem("GraphMaker3"));
         ugmDraw();
         ugmUpdateList();
     }
@@ -20,6 +20,7 @@ function ugmAddNumber() {
     let number = document.getElementById("input").value;
     if (number !== "") {
         data.numbers.push(parseFloat(number));
+        data.xValues.push(Math.max(...data.xValues)+data.delta);
         ugmUpdateAll();
     }
 
@@ -27,6 +28,19 @@ function ugmAddNumber() {
 
 function ugmDeleteSpecific(idx) {
     data.numbers.splice(idx, 1);
+    data.xValues.splice(idx,1);
+    ugmUpdateAll();
+}
+
+function ugmSpecialGraph (min, max, delta) {
+    data.numbers=[];
+    data.delta = delta;
+    data.xValues=[];
+    for (let x=min; x<=max; x+=delta) {
+        let number = x*x*x*x*x+4*x*x*x*x+7*x*x-x+1;
+        data.numbers.push(number);
+        data.xValues.push(x);
+    }
     ugmUpdateAll();
 }
 
@@ -49,17 +63,19 @@ function ugmUpdateList() {
 }
 
 function ugmUpdateStorage() {
-    storage.setItem("GraphMaker2", JSON.stringify(data));
+    storage.setItem("GraphMaker3", JSON.stringify(data));
     console.log("Successfully updated storage.");
 }
 
 function ugmUndo() {
     data.numbers.pop();
+    data.xValues.pop();
     ugmUpdateAll();
 }
 
 function ugmClearTable() {
     data.numbers=[];
+    data.xValues=[];
     ugmUpdateAll();
 }
 
@@ -78,6 +94,35 @@ function ugmDraw() {
     ctx.lineWidth = 1;
     ctx.clearRect(0, 0, width, height);
 
+    let biasY = 4 * height / 100;
+    let biasX = 1.5 * width / 100;
+    let maxNum = Math.max(...data.numbers);
+    let min = Math.min(...data.numbers);
+    let max = maxNum - min;
+    height = height - (biasY * 2);
+
+    let value = 0-min;
+    let zeroY = height - (height / max * value) + biasY;
+
+
+    ctx.beginPath();
+    ctx.moveTo(0, zeroY);
+    ctx.lineTo(width, zeroY);
+    ctx.stroke();
+
+    width = width - (biasX * 2);
+
+    let xMax = Math.max(...data.xValues);
+    let xMin = Math.min(...data.xValues);
+    let xRange = xMax-xMin;
+
+    let zeroX = (width / xRange * (0-xMin)) + biasX;
+
+    ctx.beginPath();
+    ctx.moveTo(zeroX, 0);
+    ctx.lineTo(zeroX, height+(biasY*2));
+    ctx.stroke();
+
     if (arrayLength!==0) {
         if (arrayLength === 1) {
             ctx.fillStyle = "rgb(0,0,0)";
@@ -85,14 +130,7 @@ function ugmDraw() {
             ctx.arc(width / 2, height / 2, height / 75, 0, Math.PI * 2);
             ctx.fill();
         } else {
-            let biasX = 1.5 * width / 100;
-            let biasY = 4 * height / 100;
-            width = width - (biasX * 2);
-            height = height - (biasY * 2);
             let xStep = width / (arrayLength - 1);
-            let maxNum = Math.max(...data.numbers);
-            let min = Math.min(...data.numbers);
-            let max = maxNum - min;
             if (max === 0) {
                 max = 2 * min;
                 min = 0;
@@ -118,6 +156,8 @@ function ugmDraw() {
 
 let data = {
     numbers: [],
+    xValues: [],
+    delta:1,
 };
 
 let storage = window.localStorage;
